@@ -13,6 +13,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
+    public static final String MARKETING_QUEUE = "marketing_queue";
+    public static final String FINANCE_QUEUE = "finance_queue";
+    public static final String ADMIN_QUEUE = "admin_queue";
+    public static final String DIRECT_EXCHANGE = "direct_exchange";
+    public static final String MARKETING_KEY = "marketing_key";
+    public static final String FINANCE_KEY = "finance_key";
+    public static final String ADMIN_KEY = "admin_key";
     @Value("${rabbitmq.queue.name}")
     private String queue;
 
@@ -34,22 +41,60 @@ public class RabbitMQConfig {
         return new Queue(queue);
     }
 
+    @Bean
+    public Queue jsonQueue(){
+        return new Queue(jsonQueueName);
+    }
+
+    @Bean
+    public Queue marketingQueue(){
+        return new Queue(MARKETING_QUEUE);
+    }
+
+    @Bean
+    public Queue financeQueue(){
+        return new Queue(FINANCE_QUEUE);
+    }
+
+    @Bean
+    public Queue adminQueue(){
+        return new Queue(ADMIN_QUEUE);
+    }
+
+    @Bean
+    public DirectExchange directExchange(){
+        return new DirectExchange(DIRECT_EXCHANGE);
+    }
+
+    @Bean
+    Binding marketingBinding(Queue queue, DirectExchange directExchange){
+        return BindingBuilder.bind(marketingQueue()).to(directExchange).with(MARKETING_KEY);
+    }
+
+    @Bean
+    Binding financeBinding(Queue queue, DirectExchange directExchange){
+        return BindingBuilder.bind(financeQueue()).to(directExchange).with(FINANCE_KEY);
+    }
+
+    @Bean
+    Binding adminBinding(Queue queue, DirectExchange directExchange){
+        return BindingBuilder.bind(adminQueue()).to(directExchange()).with(ADMIN_KEY);
+    }
+
+
+
 //    create an exchange
+
     @Bean
     public TopicExchange exchange(){
         return new TopicExchange(exchangeName);
     }
-
 //    binding the queue with routng key
+
     @Bean
     public Binding binding(){
         Binding with = BindingBuilder.bind(queue()).to(exchange()).with("demo_key");
         return with;
-    }
-
-    @Bean
-    public Queue jsonQueue(){
-        return new Queue(jsonQueueName);
     }
 
     @Bean
@@ -71,5 +116,7 @@ public class RabbitMQConfig {
         rabbitTemplate.setMessageConverter(messageConverter());
         return rabbitTemplate;
     }
+
+
 
 }
