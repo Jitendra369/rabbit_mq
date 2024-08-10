@@ -21,6 +21,9 @@ public class RabbitMQConfig {
     public static final String FINANCE_KEY = "finance_key";
     public static final String ADMIN_KEY = "admin_key";
     public static final String FAN_OUT_EXCHANGE = "fan_out_exchange";
+    public static final String HEADER_EXCHANGE = "header_Exchange";
+    public static final String HEADER_DEPARTMENT = "department";
+    public static final String HEADER_DEPARTMENT_MARKETING = "marketing";
     @Value("${rabbitmq.queue.name}")
     private String queue;
 
@@ -137,6 +140,27 @@ public class RabbitMQConfig {
         return rabbitTemplate;
     }
 
+//    example of topic queue , sending message through queue pattern
+    /*@Bean
+    Binding adminBinding(Queue adminQueue, TopicExchange topicExchange) {
+        return BindingBuilder.bind(adminQueue).to(topicExchange).with("queue.admin");
+    }
 
+    @Bean
+    Binding allBinding(Queue allQueue, TopicExchange topicExchange) {
+        return BindingBuilder.bind(allQueue).to(topicExchange).with("queue.*");
+    }*/
+
+//    header exchange
+    @Bean
+    HeadersExchange headersExchange(){
+        return new HeadersExchange(HEADER_EXCHANGE);
+    }
+
+//    BINDING WITH DEADER-EXCHANGE
+    @Bean
+    Binding headerExchangeMarketingBinding(Queue queue, HeadersExchange headersExchange){
+        return BindingBuilder.bind(marketingQueue()).to(headersExchange).where(HEADER_DEPARTMENT).matches(HEADER_DEPARTMENT_MARKETING);
+    }
 
 }

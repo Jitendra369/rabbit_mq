@@ -4,9 +4,13 @@ import com.rabbitmq.config.RabbitMQConfig;
 import com.rabbitmq.dto.MyCustomProducerDto;
 import com.rabbitmq.dto.ProducerDto;
 import com.rabbitmq.dto.User;
+import org.springframework.amqp.support.converter.MessageConverter;
 import com.rabbitmq.producer.RabbitMQJsonProducer;
 import com.rabbitmq.producer.RabbitMQProduce;
 import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageProperties;
+import org.springframework.amqp.support.converter.SimpleMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -81,6 +85,22 @@ public class MessageController {
     public ResponseEntity<String> fanOutExchange(@PathVariable String message){
         amqpTemplate.convertAndSend(RabbitMQConfig.FAN_OUT_EXCHANGE,"send message to rabbitMq",message);
         return ResponseEntity.ok("message has beeen send to rabbitMq");
+    }
+
+    @GetMapping("/header_exc")
+    public ResponseEntity<String> headerExchange(
+            @RequestParam("exchange_name") String exchange,
+            @RequestParam("department") String department,
+            @RequestParam("messageData") String messageData
+    ) {
+
+        MessageProperties messageProperties = new MessageProperties();
+        messageProperties.setHeader(RabbitMQConfig.HEADER_DEPARTMENT, department);
+        MessageConverter messageConverter = new SimpleMessageConverter();
+        Message message = messageConverter.toMessage(messageData, messageProperties);
+        amqpTemplate.send(exchange, "header_message_exchange ", message);
+        return ResponseEntity.ok("message has been sent to rabbitMq");
+
     }
 
 
