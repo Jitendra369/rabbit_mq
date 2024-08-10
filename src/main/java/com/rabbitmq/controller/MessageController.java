@@ -77,5 +77,11 @@ public class MessageController {
         return ResponseEntity.ok("message sent to rabbitMq");
     }
 
+    @GetMapping("/fanout/{message}")
+    public ResponseEntity<String> fanOutExchange(@PathVariable String message){
+        amqpTemplate.convertAndSend(RabbitMQConfig.FAN_OUT_EXCHANGE,"send message to rabbitMq",message);
+        return ResponseEntity.ok("message has beeen send to rabbitMq");
+    }
+
 
 }

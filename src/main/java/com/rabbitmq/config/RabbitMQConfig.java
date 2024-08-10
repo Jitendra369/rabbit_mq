@@ -20,6 +20,7 @@ public class RabbitMQConfig {
     public static final String MARKETING_KEY = "marketing_key";
     public static final String FINANCE_KEY = "finance_key";
     public static final String ADMIN_KEY = "admin_key";
+    public static final String FAN_OUT_EXCHANGE = "fan_out_exchange";
     @Value("${rabbitmq.queue.name}")
     private String queue;
 
@@ -62,25 +63,44 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public FanoutExchange fanoutExchange(){
+        return new FanoutExchange(FAN_OUT_EXCHANGE);
+    }
+
+    @Bean
     public DirectExchange directExchange(){
         return new DirectExchange(DIRECT_EXCHANGE);
     }
 
     @Bean
     Binding marketingBinding(Queue queue, DirectExchange directExchange){
-        return BindingBuilder.bind(marketingQueue()).to(directExchange).with(MARKETING_KEY);
+        return BindingBuilder.bind(directExchange()).to(directExchange).with(MARKETING_KEY);
     }
 
     @Bean
     Binding financeBinding(Queue queue, DirectExchange directExchange){
-        return BindingBuilder.bind(financeQueue()).to(directExchange).with(FINANCE_KEY);
+        return BindingBuilder.bind(directExchange()).to(directExchange).with(FINANCE_KEY);
+    }
+    @Bean
+    Binding adminBinding(Queue queue, DirectExchange directExchange){
+        return BindingBuilder.bind(directExchange()).to(directExchange).with(RabbitMQConfig.ADMIN_KEY);
+    }
+
+//    creating queue for fanout exchange , it dosen't required routing , it's like broadcasting
+    @Bean
+    Binding fanoutAdminBinding(Queue queue, FanoutExchange fanoutExchange){
+        return BindingBuilder.bind(adminQueue()).to(fanoutExchange);
     }
 
     @Bean
-    Binding adminBinding(Queue queue, DirectExchange directExchange){
-        return BindingBuilder.bind(adminQueue()).to(directExchange()).with(ADMIN_KEY);
+    Binding fanoutMarketingBinding(Queue queue, FanoutExchange fanoutExchange){
+        return BindingBuilder.bind(marketingQueue()).to(fanoutExchange);
     }
 
+    @Bean
+    Binding fanoutFinanceBinding(Queue queue, FanoutExchange fanoutExchange){
+        return BindingBuilder.bind(financeQueue()).to(fanoutExchange);
+    }
 
 
 //    create an exchange
