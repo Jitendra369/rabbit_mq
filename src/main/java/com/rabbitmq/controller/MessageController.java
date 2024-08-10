@@ -2,14 +2,13 @@ package com.rabbitmq.controller;
 
 import com.rabbitmq.config.RabbitMQConfig;
 import com.rabbitmq.dto.MyCustomProducerDto;
-import com.rabbitmq.dto.ProducerDto;
 import com.rabbitmq.dto.User;
-import org.springframework.amqp.support.converter.MessageConverter;
 import com.rabbitmq.producer.RabbitMQJsonProducer;
 import com.rabbitmq.producer.RabbitMQProduce;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.amqp.support.converter.SimpleMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +27,7 @@ public class MessageController {
     @Autowired
     private AmqpTemplate amqpTemplate;
 
+
 //    public MessageController(RabbitMQProduce rabbitMQProduce) {
 //        this.rabbitMQProduce = rabbitMQProduce;
 //    }
@@ -41,9 +41,8 @@ public class MessageController {
 
     @PostMapping("/user")
     public ResponseEntity<String> sendJsonMessage(@RequestBody User user) {
-        rabbitMQJsonProducer.send(user);
-        return ResponseEntity.ok("json message sent to rabbitMq");
-
+            rabbitMQJsonProducer.send(user);
+            return ResponseEntity.ok("json message sent to rabbitMq");
     }
 
     @PostMapping("/send")

@@ -7,6 +7,8 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class RabbitMQJsonProducer {
 
@@ -29,6 +31,6 @@ public class RabbitMQJsonProducer {
 
     public void send(User user) {
         log.info("Sending user: {}", user);
-        rabbitTemplate.convertAndSend(exchange,routingKey,user);
+            rabbitTemplate.convertAndSend(exchange,routingKey,user);
     }
 }
